@@ -2,7 +2,6 @@ package main
 
 import (
 	database "example.com/myproject/Desktop/sahl/golang_learn/apps/emp_sys_gin_gorm/DataBase"
-	//models "example.com/myproject/Desktop/sahl/golang_learn/apps/emp_sys_gin_gorm/Models"
 )
 
 func main() {
