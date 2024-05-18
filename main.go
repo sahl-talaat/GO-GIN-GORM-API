@@ -1,28 +1,57 @@
 package main
 
 import (
-	database "example.com/myproject/Desktop/sahl/golang_learn/apps/emp_sys_gin_gorm/DataBase"
+	"fmt"
+
+	"myapp/Config"
+	"myapp/Routes"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+
+	models "myapp/Models"
 )
 
-func main() {
+var err error
 
-	_, err := database.InitializeDB()
-	if err != nil {
-		panic(err)
+func main() {
+	//dsn := "root:sahl1049@tcp(127.0.0.1:3306)/EmpDB?charset=utf8mb4&parseTime=True&loc=Local"
+	//database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if Config.DB, err = gorm.Open(mysql.Open(Config.DbURL(Config.BuildDBConfig())), &gorm.Config{}); err != nil {
+		fmt.Println("status: ", err)
 	}
 
-	//db := database.GetDB()
+	Config.DB.AutoMigrate(&models.Employee{}, &models.Department{})
 
-	/* department := models.Department{}
-	db.Create(&department)
+	app := gin.Default()
 
-	personalData := models.PersonalData{}
-	db.Create(&personalData)
+	Routes.SetupRouter(app)
 
-	workSession := models.WorkSession{}
-	db.Create(&workSession)
+	app.Run(":8088")
 
-	employee := models.Employee{DepartmentID: department.ID, PersonalDataID: personalData.ID, WorkSessionID: workSession.ID}
-	db.Create(&employee) */
+	// _, err := database.InitializeDB()
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+
+	// app := gin.Default()
+
+	// app.POST("/api/employees", routing.CreateEmployee)
+	// app.POST("/api/departments", routing.CreateDepartment)
+
+	// app.GET("api/employees/:id", routing.GetEmpByID)
+	// app.GET("api/departments/:id", routing.GetDepartByID)
+
+	// app.GET("/api/departments", routing.GetAllDepart)
+	// app.GET("/api/employees", routing.GetAllEmplyee)
+
+	// app.PUT("/api/employees/:id", routing.UpdateEmpByID)
+	// app.PUT("/api/departments/:id", routing.UpdateDepartByID)
+
+	// app.DELETE("/api/employees/:id", routing.DeleteEmpByID)
+	// app.DELETE("/api/departments/:id", routing.DeleteDepartByID)
+
+	// app.Run(":8088")
 
 }
