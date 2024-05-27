@@ -1,28 +1,45 @@
 package main
 
 import (
-	database "example.com/myproject/Desktop/sahl/golang_learn/apps/emp_sys_gin_gorm/DataBase"
+	"fmt"
+	"log"
+	config "myapp/Config"
+	models "myapp/Models"
+	routes "myapp/Router"
+	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 
-	_, err := database.InitializeDB()
+	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal("Error loading .env file")
 	}
 
-	//db := database.GetDB()
+	err = config.InitDB()
+	if err != nil {
+		log.Fatalf("Could not initialize database: %v", err)
+	}
 
-	/* department := models.Department{}
-	db.Create(&department)
+	err = config.DB.AutoMigrate(models.Employee{}, models.Department{})
+	if err != nil {
+		fmt.Printf("faild to migrate schema: %v", err)
+	}
 
-	personalData := models.PersonalData{}
-	db.Create(&personalData)
+	app := gin.Default()
+	routes.RegisterRouter(app)
 
-	workSession := models.WorkSession{}
-	db.Create(&workSession)
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8090"
+	}
 
-	employee := models.Employee{DepartmentID: department.ID, PersonalDataID: personalData.ID, WorkSessionID: workSession.ID}
-	db.Create(&employee) */
-
+	log.Printf("server listening on port %s", port)
+	if err := http.ListenAndServe(":"+port, app); err != nil {
+		log.Fatalf("Error starting server: %v", err)
+	}
 }
